@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galeri & Undangan Foto</title>
+
+<style>
+  body { margin:0; padding:0; font-family:"Segoe UI",sans-serif; }
+  .container {
+    max-width:900px; margin:40px auto; padding:25px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:18px;
+    box-shadow:0 0 25px rgba(0,0,0,0.4);
+  }
+  h2 { text-align:center; color:#8bc4ff; margin-bottom:5px; }
+  .subtext { text-align:center; opacity:.8; margin-bottom:20px; }
+
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:15px;
+  }
+  .photo { 
+    border-radius:14px; overflow:hidden; background:#111;
+    box-shadow:0 0 15px rgba(0,0,0,0.35);
+  }
+  .photo img {
+    width:100%; height:100%; object-fit:cover;
+    cursor:pointer; transition:.3s;
+  }
+  .photo:hover img { transform:scale(1.03); filter:brightness(1.1); }
+
+  .viewer {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.92);
+    justify-content:center; align-items:center;
+    z-index:9999;
+  }
+  .viewer img {
+    max-width:95%; max-height:90vh; border-radius:12px;
+  }
+  .close-btn {
+    position:fixed; top:18px; right:25px;
+    font-size:45px; color:white; cursor:pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- UNDANGAN -->
+<div class="container">
+  <h2>🤍✨Salimatun Hasanah & Muktiono Nugroho✨🤍</h2>
+  <p class="subtext">Undangan Acara</p>
+  <div class="grid" id="undangan"></div>
+</div>
+
+<!-- GALERI -->
+<div class="container">
+  <h2>📸 Galeri Foto</h2>
+  <p class="subtext">Dokumentasi Acara & Suasana</p>
+  <div class="grid" id="gallery"></div>
+</div>
+
+<!-- VIEWER -->
+<div id="viewer" class="viewer">
+  <span class="close-btn" onclick="closeViewer()">×</span>
+  <img id="viewer-img">
+</div>
+
+<script>
+/* =======================
+   ARRAY GLOBAL
+======================= */
+let fotoUndangan = [];
+let fotoGaleri   = [];
+let currentArray = [];   // array aktif (undangan / galeri)
+let currentIndex = 0;    // index aktif
+
+/* =======================
+   LOAD FOTO (1-endpoint)
+======================= */
+async function loadFoto() {
+  console.log("🔄 Fetching /api/foto ...");
+
+  const res  = await fetch("/api/foto");
+  const data = await res.json();
+
+  fotoUndangan = data.undangan || [];
+  fotoGaleri   = data.galeri   || [];
+
+  console.log("📦 Undangan:", fotoUndangan);
+  console.log("📦 Galeri  :", fotoGaleri);
+
+  /* Render Undangan */
+  const und = document.getElementById("undangan");
+  fotoUndangan.forEach((f, i) => {
+    und.innerHTML += `
+      <div class="photo">
+        <img src="/static/undangan/${f}" onclick="openViewer('undangan', ${i})">
+      </div>`;
+  });
+
+  /* Render Galeri */
+  const gal = document.getElementById("gallery");
+  fotoGaleri.forEach((f, i) => {
+    gal.innerHTML += `
+      <div class="photo">
+        <img src="/static/gallery/${f}" onclick="openViewer('galeri', ${i})">
+      </div>`;
+  });
+}
+
+/* =======================
+   VIEWER OPEN / CLOSE
+======================= */
+function openViewer(tipe, index) {
+  currentArray = (tipe === "undangan") ? fotoUndangan : fotoGaleri;
+  currentIndex = index;
+
+  const base = (tipe === "undangan") ? "/static/undangan/" : "/static/gallery/";
+  document.getElementById("viewer-img").src = base + currentArray[currentIndex];
+
+  document.getElementById("viewer").style.display = "flex";
+}
+
+function closeViewer() {
+  document.getElementById("viewer").style.display = "none";
+}
+
+/* =======================
+   NEXT / PREV
+======================= */
+function nextFoto() {
+  currentIndex = (currentIndex + 1) % currentArray.length;
+  openViewer(currentArray === fotoUndangan ? "undangan" : "galeri", currentIndex);
+}
+
+function prevFoto() {
+  currentIndex = (currentIndex - 1 + currentArray.length) % currentArray.length;
+  openViewer(currentArray === fotoUndangan ? "undangan" : "galeri", currentIndex);
+}
+
+/* =======================
+   SWIPE
+======================= */
+let startX = 0;
+
+document.getElementById("viewer").addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.getElementById("viewer").addEventListener("touchend", e => {
+  const endX = e.changedTouches[0].clientX;
+
+  if (endX < startX - 50) nextFoto();
+  if (endX > startX + 50) prevFoto();
+});
+
+/* CLICK BACKGROUND */
+document.getElementById("viewer").addEventListener("click", e => {
+  if (e.target.id === "viewer") closeViewer();
+});
+
+/* START */
+loadFoto();
+</script>
+
+</body>
+</html>

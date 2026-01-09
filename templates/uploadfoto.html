@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Foto – Admin</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: #0e1116;
+  font-family: "Segoe UI", sans-serif;
+  color: #e5e5e5;
+}
+
+.container {
+  max-width: 500px;
+  margin: 60px auto;
+  background: rgba(255,255,255,0.05);
+  padding: 35px 30px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 0 25px rgba(0,0,0,0.4);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #8bc4ff;
+}
+
+.message {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #8bc4ff;
+}
+
+label {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #1b1f24;
+  color: #e5e5e5;
+  margin-bottom: 20px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #8bc4ff;
+  border: none;
+  color: #0e1116;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #a6d4ff;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #8bc4ff;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.back:hover {
+  opacity: 1;
+}
+
+/* ======================= */
+/*       LOADING CSS       */
+/* ======================= */
+
+#loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.spinner {
+  width: 55px;
+  height: 55px;
+  border: 6px solid rgba(255,255,255,0.2);
+  border-top-color: #8bc4ff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 15px;
+  color: #cfe8ff;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Mengunggah foto...</div>
+</div>
+
+<div class="container">
+  <h1>Upload Foto Baru</h1>
+
+  {% if message %}
+    <p class="message">{{ message }}</p>
+  {% endif %}
+
+ <form
+  id="uploadForm"
+  action="/admin/{{ token }}/uploadfoto"
+  method="POST"
+  enctype="multipart/form-data"
+>
+  <label>Pilih Foto (JPG / PNG / WEBP)</label>
+  <input
+    type="file"
+    name="file"
+    accept="image/*"
+    required
+  >
+  <button type="submit">Upload</button>
+</form>
+
+</div>
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", function() {
+  // tampilkan loading overlay
+  document.getElementById("loading-overlay").style.display = "flex";
+
+  // disable tombol agar tidak klik dua kali
+  const btn = this.querySelector("button");
+  btn.disabled = true;
+  btn.innerText = "Mengunggah...";
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<div class="card">
+  <h3>Kirim Ucapan 💌</h3>
+  <div class="warning-text">Anda hanya bisa mengirim ucapan 1 kali saja.</div>
+
+  <form id="formUcapan">
+    <textarea name="ucapan" id="textUcapan" placeholder="Tulis ucapan terbaik Anda..." required></textarea>
+    <button type="submit" id="btnUcapan">Kirim</button>
+  </form>
+
+  <!-- HASIL AJAX (TUNGGAL) -->
+  <div id="ucapan-result">
+    {% if message %}
+      <div class="message {{ message_type }}">{{ message }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+    margin: 2rem auto;
+  }
+
+  h3 {
+    color: #4a6fa8;
+    margin-top: 0;
+  }
+
+  .warning-text {
+    font-size: 13px;
+    color: #d9534f;
+    margin-bottom: 15px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 120px;
+    padding: 0.8rem;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    resize: none;
+    font-size: 1rem;
+  }
+
+  button {
+    width: 100%;
+    padding: 0.85em;
+    background: #3897f0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #318ce7;
+  }
+
+  .message {
+    margin-top: 1.3rem;
+    padding: 0.9em;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #2e7d32;
+  }
+
+  .warning {
+    background-color: #fff8e1;
+    color: #a07600;
+    border: 1px solid #a07600;
+  }
+
+  .error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #c62828;
+  }
+</style>
+
+<script>
+document.getElementById('formUcapan').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const ucapan = this.ucapan.value.trim();
+
+  if (ucapan.length < 3) {
+    alert("Ucapan terlalu singkat.");
+    return;
+  }
+
+  // Disable tombol kirim
+  const btn = document.getElementById('btnUcapan');
+  btn.disabled = true;
+  btn.innerText = "Mengirim...";
+
+  const response = await fetch('{{ url_for("kirim_ucapan") }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ ucapan })
+  });
+
+  const html = await response.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  const result = doc.getElementById('ucapan-result');
+  document.getElementById('ucapan-result').innerHTML =
+    result ? result.innerHTML : '<div class="message error">Gagal memuat hasil.</div>';
+
+  // Jika sukses → disable textarea & tombol
+  if (html.includes("success")) {
+    document.getElementById("textUcapan").disabled = true;
+    btn.disabled = true;
+  } else {
+    btn.disabled = false;
+    btn.innerText = "Kirim";
+  }
+
+  this.reset();
+});
+</script>

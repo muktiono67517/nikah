@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lokasi Acara Pernikahan</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f7f9fc;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 35px 40px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4a6fa8;
+      font-size: 1.9em;
+    }
+
+    .subtext {
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .map-wrapper {
+      width: 100%;
+      height: 360px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+      margin-bottom: 30px;
+    }
+
+    .map-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Tombol Google Maps */
+    .gmaps-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #8bc4ff;
+      color: #0e1116;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 15px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+      transition: 0.25s;
+    }
+
+    .gmaps-button:hover {
+      background: #a6d4ff;
+      transform: translateY(-2px);
+    }
+
+    .gmaps-button img {
+      height: 22px;
+    }
+
+    /* Wrapper supaya tombol benar-benar center */
+    .button-center {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>📍Lokasi Acara Pernikahan</h1>
+
+    <p class="subtext">
+      Silakan lihat peta di bawah ini untuk menuju lokasi acara.<br>
+      Anda dapat membuka lokasi langsung di Google Maps.
+    </p>
+
+    <!-- GOOGLE MAPS EMBED -->
+    <div class="map-wrapper">
+      <iframe
+        src="https://maps.google.com/maps?q=-73.212341,52.317752&z=10&output=embed"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+
+    <!-- TOMBOL GOOGLE MAPS DITENGAHKAN -->
+    <div class="button-center">
+      <a class="gmaps-button"
+         href="https://maps.app.goo.gl/d8Rqek7zsiqxUvCKA"
+         target="_blank">
+
+        <img src="https://img.icons8.com/?size=100&id=DcygmpZqBEd9&format=png&color=000000" 
+             alt="Maps">
+
+        Buka di Google Maps
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

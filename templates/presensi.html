@@ -1,0 +1,152 @@
+<div class="card">
+  <h3>Presensi Tamu</h3><br>
+
+  <form id="formPresensi">
+  <input
+    type="text"
+    id="nama"
+    name="nama"
+    placeholder="Nama semua tamu (pisahkan dengan koma)"
+    required
+    style="width:100%; padding:0.85em; border-radius:8px; border:1px solid #ccc; margin-bottom:0.25rem; font-size:1rem;"
+  />
+<small style="display:block; margin-bottom:1rem; color:#666;">
+  Diisi oleh satu orang saja (kepala keluarga / salah satu dari keluarga).
+  Tuliskan nama semua anggota keluarga yang datang.
+  Contoh: Alaric, Elowen, Kael
+</small>
+
+
+
+
+  <input
+    type="text"
+    id="asal"
+    name="asal"
+    placeholder="Alamat"
+    style="width:100%; padding:0.85em; border-radius:8px; border:1px solid #ccc; margin-bottom:1rem; font-size:1rem;"
+  />
+
+  <textarea
+    id="ucapan"
+    name="ucapan"
+    placeholder="Ucapan atau doa (boleh diisi maupun tidak diisi)"
+    rows="3"
+    style="width:100%; padding:0.85em; border-radius:8px; border:1px solid #ccc; margin-bottom:1rem; font-size:1rem; resize:none;"
+  ></textarea>
+
+  <button type="submit">Kirim Presensi</button>
+
+</form>
+
+
+ <div id="presensi-result">
+  {% if message %}
+    <div class="message {{ message_type }}">
+      {{ message }}
+    </div>
+  {% endif %}
+</div>
+
+
+<style>
+  .card {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    margin: 2rem auto;
+  }
+
+  .prefix-select {
+    width: 30%;
+    padding: 0.85em;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background:#f5f5f5;
+    font-weight:600;
+    font-size:1rem;
+  }
+
+  .kode-input {
+    width: 70%;
+    padding: 0.85em;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background:#fafafa;
+    font-size:1rem;
+  }
+  
+  .kode-input:focus {
+    outline:none;
+    border-color:#6a8bff;
+    box-shadow:0 0 0 2px rgba(100,120,255,0.2);
+  }
+
+  button {
+    width: 100%;
+    padding: 0.85em;
+    background: #3897f0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    background: #318ce7;
+  }
+</style>
+
+
+<script>
+const form = document.getElementById("formPresensi");
+const resultBox = document.getElementById("presensi-result");
+
+/* ========= Submit AJAX + Validasi =========== */
+form.addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const nama = form.nama.value.trim();
+  const asal = form.asal.value.trim();
+
+  // Validasi sederhana
+  if (!nama) {
+    resultBox.innerHTML = '<div class="message error">Nama tamu belum diisi.</div>';
+    return;
+  }
+
+  if (!asal) {
+    resultBox.innerHTML = '<div class="message error">Alamat belum diisi.</div>';
+    return;
+  }
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch('{{ url_for("presensi") }}', {
+      method: 'POST',
+      body: new URLSearchParams(formData)
+    });
+
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const result = doc.getElementById('presensi-result');
+    resultBox.innerHTML = result
+      ? result.innerHTML
+      : '<div class="message error">Gagal memuat hasil.</div>';
+
+    form.reset(); // bersihkan input setelah berhasil
+  } catch (err) {
+    resultBox.innerHTML = '<div class="message error">Terjadi kesalahan. Silakan coba lagi.</div>';
+  }
+});
+</script>
